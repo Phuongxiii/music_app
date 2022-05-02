@@ -16,25 +16,28 @@ class _ResultScreenState extends State<ResultScreen> {
   final bool hasPadding = false;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.backGroundColor,
-      body: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.only(bottom: 60.0),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final video = widget.videoList[index];
-                  return VideoCard(video);
-                },
-                childCount: widget.videoList.length,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: const Text("Result")),
+        backgroundColor: AppColor.backGroundColor,
+        body: CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 60.0),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final video = widget.videoList[index];
+                    return VideoCard(video);
+                  },
+                  childCount: widget.videoList.length,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+        floatingActionButton: ButtonMenu(),
       ),
-      floatingActionButton: ButtonMenu(),
     );
   }
 

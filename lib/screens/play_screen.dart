@@ -1,9 +1,9 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:music_app/components/colors.dart';
 import 'package:youtube_api/youtube_api.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class PlayScreen extends StatefulWidget {
   YouTubeVideo video;
@@ -13,127 +13,64 @@ class PlayScreen extends StatefulWidget {
   State<PlayScreen> createState() => _PlayScreenState();
 }
 
-class _PlayScreenState extends State<PlayScreen> {
-  late VideoPlayerController _videoPlayerController;
-  ChewieController? _chewieController;
+class _PlayScreenState extends State<PlayScreen>
+    with SingleTickerProviderStateMixin {
+  late YoutubePlayerController _controller;
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
-    initializePlayer();
+    _animationController =
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _controller = YoutubePlayerController(
+        initialVideoId: widget.video.id!,
+        flags: YoutubePlayerFlags(
+          autoPlay: true,
+          loop: true,
+          mute: false,
+        ));
   }
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
-    _chewieController?.dispose();
+    _controller.dispose();
     super.dispose();
-  }
-
-  Future<void> initializePlayer() async {
-    _videoPlayerController = VideoPlayerController.network(widget.video.url);
-    await Future.wait([
-      _videoPlayerController.initialize(),
-    ]);
-    _createChewieController();
-    setState(() {});
-  }
-
-  void _createChewieController() {
-    final subtitles = [
-      Subtitle(
-        index: 0,
-        start: Duration.zero,
-        end: const Duration(seconds: 10),
-        text: const TextSpan(
-          children: [
-            TextSpan(
-              text: 'Hello',
-              style: TextStyle(color: Colors.red, fontSize: 22),
-            ),
-            TextSpan(
-              text: ' from ',
-              style: TextStyle(color: Colors.green, fontSize: 20),
-            ),
-            TextSpan(
-              text: 'subtitles',
-              style: TextStyle(color: Colors.blue, fontSize: 18),
-            )
-          ],
-        ),
-      ),
-      Subtitle(
-        index: 0,
-        start: const Duration(seconds: 10),
-        end: const Duration(seconds: 20),
-        text: 'Whats up? :)',
-      ),
-    ];
-
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController,
-      autoPlay: true,
-      looping: true,
-      additionalOptions: (context) {
-        return <OptionItem>[
-          OptionItem(
-            onTap: toggleVideo,
-            iconData: Icons.live_tv_sharp,
-            title: 'Toggle Video Src',
-          ),
-        ];
-      },
-      subtitle: Subtitles(subtitles),
-      subtitleBuilder: (context, dynamic subtitle) => Container(
-        padding: const EdgeInsets.all(10.0),
-        child: subtitle is InlineSpan
-            ? RichText(
-                text: subtitle,
-              )
-            : Text(
-                subtitle.toString(),
-                style: const TextStyle(color: Colors.black),
-              ),
-      ),
-    );
-  }
-
-  int currPlayIndex = 0;
-
-  Future<void> toggleVideo() async {
-    await _videoPlayerController.pause();
-    currPlayIndex = currPlayIndex == 0 ? 1 : 0;
-    await initializePlayer();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Container(
-            child: Column(children: [
-      Expanded(
-        child: Center(
-          child: _chewieController != null &&
-                  _chewieController!.videoPlayerController.value.isInitialized
-              ? Chewie(
-                  controller: _chewieController!,
-                )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 20),
-                    Text('Loading'),
-                  ],
+    return SafeArea(
+      child: Scaffold(
+          backgroundColor: AppColor.backGroundColor,
+          body: Column(
+            children: [
+              YoutubePlayer(
+                controller: _controller,
+                showVideoProgressIndicator: true,
+                onReady: () {},
+              ),
+              Row(
+                children: [
+                  IconButton(
+                      onPressed: () {}, icon: const Icon(Icons.line_style)),
+                  IconButton(onPressed: () {}, icon: const Icon(Icons.share)),
+                  IconButton(
+                      onPressed: () {},
+                      icon: AnimatedIcon(
+                          icon: AnimatedIcons.add_event,
+                          progress: _animationController)),
+                ],
+              ),
+              Text(
+                widget.video.title,
+                style: TextStyle(
+                  color: AppColor.textColor,
+                  fontSize: 24,
                 ),
-        ),
-      ),
-      TextButton(
-        onPressed: () {
-          _chewieController?.enterFullScreen();
-        },
-        child: const Text('Fullscreen'),
-      ),
-    ])));
+              ),
+            ],
+          )),
+    );
   }
 }

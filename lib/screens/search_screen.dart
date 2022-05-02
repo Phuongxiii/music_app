@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:music_app/components/colors.dart';
-import 'package:music_app/connect_to_youtube_api.dart';
 import 'package:music_app/screens/result_screen.dart';
 import 'package:youtube_api/youtube_api.dart';
 
@@ -15,13 +14,21 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   late TextEditingController _controller;
-  late String TextSearch;
+  static String key = "AIzaSyA3YEflFlVxNsaYltQ_XpFgtBLbTkIWO7s";
+
+  YoutubeAPI youtube = YoutubeAPI(key);
+  List<YouTubeVideo> videoResult = [];
+  Future<void> callAPI(String query) async {
+    videoResult =
+        await youtube.search(query, order: 'relevance', type: 'video');
+    videoResult = await youtube.nextPage();
+    Navigator.of(context).push(_createRoute(videoResult));
+  }
+
   late List<YouTubeVideo> videoList;
-  late ConnectApi _connectApi;
   @override
   void initState() {
     super.initState();
-    _connectApi = ConnectApi();
     _controller = TextEditingController();
   }
 
@@ -33,22 +40,22 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColor.componentColor,
-        flexibleSpace: TextField(
-          controller: _controller,
-          autofocus: true,
-          textAlign: TextAlign.center,
-          onSubmitted: (Text) {
-            videoList = _connectApi.getData(Text);
-            Navigator.of(context).push(_createRoute(videoList));
-            print(videoList.length);
-          },
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColor.componentColor,
+          flexibleSpace: TextField(
+            controller: _controller,
+            autofocus: true,
+            textAlign: TextAlign.center,
+            onSubmitted: (Text) {
+              callAPI(Text);
+            },
+          ),
         ),
+        body: Container(),
+        backgroundColor: AppColor.backGroundColor,
       ),
-      body: Container(),
-      backgroundColor: AppColor.backGroundColor,
     );
   }
 }

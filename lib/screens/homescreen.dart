@@ -21,7 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   YoutubeAPI youtube = YoutubeAPI(key);
   List<YouTubeVideo> videoResult = [];
   Future<void> callAPI(String query) async {
-    videoResult = await youtube.search(query, order: 'relevance');
+    videoResult =
+        await youtube.search(query, order: 'relevance', type: 'video');
     videoResult = await youtube.nextPage();
     setState(() {});
   }
@@ -34,26 +35,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.backGroundColor,
-      body: CustomScrollView(
-        slivers: [
-          CustomSliverAppBar(),
-          SliverPadding(
-            padding: const EdgeInsets.only(bottom: 60.0),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final video = videoResult[index];
-                  return VideoCard(video);
-                },
-                childCount: videoResult.length,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: AppColor.backGroundColor,
+        body: CustomScrollView(
+          slivers: [
+            CustomSliverAppBar(),
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 60.0),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final video = videoResult[index];
+                    return VideoCard(video);
+                  },
+                  childCount: videoResult.length,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+        floatingActionButton: ButtonMenu(),
       ),
-      floatingActionButton: ButtonMenu(),
     );
   }
 

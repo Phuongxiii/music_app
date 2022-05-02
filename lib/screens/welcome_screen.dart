@@ -26,23 +26,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.backGroundColor,
-      body: GestureDetector(
-        onTap: () {
-          Navigator.of(context).push(_createRoute());
-        },
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Lottie.asset('assets/101381-orange-t-shirt-coder.json'),
-              const Padding(
-                padding: EdgeInsets.all(64.0),
-                child: CircularProgressIndicator(),
-              ),
-            ],
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: AppColor.backGroundColor,
+        body: GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(_createRoute());
+          },
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Lottie.asset('assets/101381-orange-t-shirt-coder.json'),
+                const Padding(
+                  padding: EdgeInsets.all(64.0),
+                  child: CircularProgressIndicator(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
