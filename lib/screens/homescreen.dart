@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
           slivers: [
             CustomSliverAppBar(),
             SliverPadding(
-              padding: const EdgeInsets.only(bottom: 60.0),
+              padding: const EdgeInsets.only(bottom: 0),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
